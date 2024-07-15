@@ -231,7 +231,7 @@ def test(data,
         if model.dump_model:
             break
         if model.quant_mode == 'calib':
-            if batch_i == 999:
+            if batch_i == total-1:
                 break
 
     if not training:
