@@ -15,7 +15,7 @@ pip install -r yolov7/requirements.txt
 
 ##### Others
 ```bash
-conda create -n yolov7 python=3.7
+conda create -n yolov7 python=3.9
 conda activate yolov7
 pip install -r yolov7/requirements.txt
 ```
@@ -45,7 +45,7 @@ python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --io
 ```bash
 cd yolov7/
 # run calibration & test & dump xmodel
-python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights yolov7.pt --name yolov7_640_val --quant_mode calib --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
+python test_nndct.py --data dataset/license_data/license_plates.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights dataset/yolov7n_best.pt --name yolov7_640_val --quant_mode calib --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
 
 python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights yolov7.pt --name yolov7_640_val --quant_mode test --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
 ```
