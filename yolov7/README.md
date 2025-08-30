@@ -15,7 +15,7 @@ pip install -r yolov7/requirements.txt
 
 ##### Others
 ```bash
-conda create -n yolov7 python=3.9
+conda create -n yolov7 python=3.7
 conda activate yolov7
 pip install -r yolov7/requirements.txt
 ```
