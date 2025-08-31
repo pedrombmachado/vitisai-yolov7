@@ -1,9 +1,75 @@
-# Vitis AI Copyleft Model Zoo
+## YOLOv7 
 
-The purpose of this repository is to provide enablement to developers choosing to use popular models that are not compatible with the Vitis™ AI Apache 2.0 license.  The original source code for these models was released under a copyleft, reciprocal, or otherwise non-permissive license.  The purpose of releasing these models in this separate repository is to clearly identify the source license (inherited license) for each model.
+### Hardware friendly changes
+- Change the activation operation from SiLU to HardSiLU in quantization
 
-In order for users to leverage these models with Vitis AI, model source code modifications are required.  This repository provides users with the required source-code modifications to ensure compatibility with Vitis AI. Pre-compiled versions of these models are not provided because the Vitis AI Compiler is not open-source.  Users, at their discretion, and subject to the terms of the inherited license, may leverage the scripts provided as a template to compile the model for their target using the Vitis AI Compiler.
+### Prepare
 
-The directory structure of this repository is such that each model is uniquely associated with a specific license file, allowing the user to evaluate the license requirements for each model.  It is the user's responsibility to verify that the model license is compatible with their own company policies and legal requirements.  
+#### Prepare the environment
+
+##### For vitis-ai docker user
+```bash
+conda activate vitis-ai-pytorch
+pip install -r yolov7/requirements.txt
+```
+
+##### Others
+```bash
+conda create -n yolov7 python=3.7
+conda activate yolov7
+pip install -r yolov7/requirements.txt
+```
+
+#### Prepare the dataset
+Put coco2017 dataset under the ./yolov7/coco directory, dataset directory structure like:
+```markdown
++ yolov7/coco/
+    + labels/
+    + annotations/
+    + images/
+    + test-dev2017.txt 
+    + train2017.txt
+    + val2017.txt
+```
+
+### For yolov7 Eval/QAT
 
 
+#### Eval float model
+```bash
+cd yolov7/
+python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights yolov7.pt --name yolov7_640_val --quant_mode float
+```
+
+#### Run Post-training quantisation
+```bash
+cd yolov7/
+# run calibration & test & dump xmodel
+python test_nndct.py --data dataset/license_data/license_plates.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights dataset/yolov7n_best.pt --name yolov7_640_val --quant_mode calib --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
+
+python test_nndct.py --data dataset/license_data/license_plates.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights dataset/yolov7n_best.pt --name yolov7_640_val --quant_mode calib --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
+```
+
+#### Dump PTQ model
+```bash
+cd yolov7/
+python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights yolov7.pt --name yolov7_640_val --quant_mode test --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish --dump_model
+```
+
+#### Quantization aware training 
+```bash
+cd yolov7/
+python -m torch.distributed.launch --nproc_per_node 4 --master_port 9004 train_qat.py --workers 8 --device 0,1,2,3 --batch-size 32 --data data/coco.yaml --img 640 640 --cfg cfg/training/yolov7.yaml --weights yolov7.pt --name yolov7_qat --hyp data/hyp.scratch.p5_qat.yaml --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish --log_threshold_scale 100
+```
+
+#### Run Quantization aware training model quantization
+```bash
+cd yolov7/
+python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights runs/train/yolov7_qat/weights/best.pt --name yolov7_640_val --quant_mode test --nndct_qat --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
+```
+
+#### Dump QAT model
+```bash
+cd yolov7/
+python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights runs/train/yolov7_qat/weights/best.pt --name yolov7_640_val --quant_mode test --nndct_qat --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish --dump_model
+```
