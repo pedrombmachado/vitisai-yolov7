@@ -41,13 +41,13 @@ cd yolov7/
 python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights yolov7.pt --name yolov7_640_val --quant_mode float
 ```
 
-#### Run Post-training quantization
+#### Run Post-training quantisation
 ```bash
 cd yolov7/
 # run calibration & test & dump xmodel
 python test_nndct.py --data dataset/license_data/license_plates.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights dataset/yolov7n_best.pt --name yolov7_640_val --quant_mode calib --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
 
-python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights yolov7.pt --name yolov7_640_val --quant_mode test --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
+python test_nndct.py --data dataset/license_data/license_plates.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights dataset/yolov7n_best.pt --name yolov7_640_val --quant_mode calib --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish
 ```
 
 #### Dump PTQ model
@@ -73,24 +73,3 @@ python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --io
 cd yolov7/
 python test_nndct.py --data data/coco.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --weights runs/train/yolov7_qat/weights/best.pt --name yolov7_640_val --quant_mode test --nndct_qat --nndct_convert_sigmoid_to_hsigmoid --nndct_convert_silu_to_hswish --dump_model
 ```
-
-### Performance
-
-| Model | Input Size | mAP | FLOPs |
-|-------|------------|--------------|-------|
-| YOLOv7 | 640 | 50.9% | 104.8G |
-| YOLOv7 QUANT| 640 | 40.8% | - |
-| YOLOv7 QAT| 640 | 47.9% | - |
-
-### GPU Model Weights Download: [YOLOv7](https://www.xilinx.com/bin/public/openDownload?filename=pt_yolov7_3.5.zip)
-
-### **Pre-Compiled Models For Hardware Acceleration Platform**
-
-- **Board: VEK280**
-  - Type: xmodel
-  - DownLoad Link: https://www.xilinx.com/bin/public/openDownload?filename=yolov7_pt-vek280-r3.5.0.tar.gz
-  - Checksum:56c823bca1583b730847163ff89f1e82
-- **Board: V70**
-  - Type: xmodel
-  - DownLoad Link: https://www.xilinx.com/bin/public/openDownload?filename=yolov7_pt-v70-DPUCV2DX8G-r3.5.0.tar.gz
-  - Checksum: 9ebe915378a483eb5730f7568ab7ec1a
